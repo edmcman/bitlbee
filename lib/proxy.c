@@ -42,6 +42,8 @@ int proxytype = PROXY_NONE;
 char proxyuser[128] = "";
 char proxypass[128] = "";
 
+gchar** noproxies = NULL;
+
 /* Some systems don't know this one. It's not essential, so set it to 0 then. */
 #ifndef AI_NUMERICSERV
 #define AI_NUMERICSERV 0
@@ -65,6 +67,18 @@ struct PHB {
 typedef int (*proxy_connect_func)(const char *host, unsigned short port_, struct PHB *phb);
 
 static int proxy_connect_none(const char *host, unsigned short port_, struct PHB *phb);
+
+static gboolean no_proxy_for_host (const char *host)
+{
+  gchar** p;
+
+  for (p = noproxies; *p; p++) {
+    if (g_str_has_suffix (host, *p))
+      return 1;
+  }
+
+  return 0;
+}
 
 static gboolean phb_free(struct PHB *phb, gboolean success)
 {
@@ -556,8 +570,8 @@ int proxy_connect(const char *host, int port, b_event_handler func, gpointer dat
 	phb->func = func;
 	phb->data = data;
 
-	if (proxyhost[0] && proxyport > 0 && proxytype >= 0 && proxytype < G_N_ELEMENTS(proxy_connect_funcs_array)) {
-		fun = proxy_connect_funcs_array[proxytype];
+	if (proxyhost[0] && proxyport > 0 && proxytype >= 0 && proxytype < G_N_ELEMENTS(proxy_connect_funcs_array) && !no_proxy_for_host (host)) {
+	        fun = proxy_connect_funcs_array[proxytype];
 	} else {
 		fun = proxy_connect_none;
 	}

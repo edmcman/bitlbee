@@ -320,6 +320,8 @@ static int conf_loadini(conf_t *conf, char *file)
 				}
 
 				g_free(url);
+			} else if (g_strcasecmp(ini->key, "noproxy") == 0) {
+			        noproxies = g_strsplit (ini->value, ":", 0);
 			} else if (g_strcasecmp(ini->key, "user") == 0) {
 				g_free(conf->user);
 				conf->user = g_strdup(ini->value);

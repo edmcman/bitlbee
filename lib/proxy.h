@@ -46,6 +46,7 @@ extern int proxyport;
 extern int proxytype;
 extern char proxyuser[128];
 extern char proxypass[128];
+extern gchar** noproxies;
 
 G_MODULE_EXPORT int proxy_connect(const char *host, int port, b_event_handler func, gpointer data);
 G_MODULE_EXPORT void proxy_disconnect(int fd);
